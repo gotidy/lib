@@ -1,6 +1,7 @@
 package set
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -146,11 +147,11 @@ func (s Set[M]) Has(member M) bool {
 
 func (s Set[M]) string(format string) string {
 	if len(s) == 0 {
-		return "{}"
+		return "[]"
 	}
 
 	b := strings.Builder{}
-	b.WriteString("{")
+	b.WriteString("[")
 	comma := false
 	for member := range s {
 		if comma {
@@ -159,7 +160,7 @@ func (s Set[M]) string(format string) string {
 		comma = true
 		b.WriteString(fmt.Sprintf(format, member))
 	}
-	b.WriteString("}")
+	b.WriteString("]")
 	return b.String()
 }
 
@@ -171,6 +172,46 @@ func (s Set[M]) String() string {
 // GoString format set.
 func (s Set[M]) GoString() string {
 	return s.string("%#v")
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (s Set[M]) MarshalJSON() ([]byte, error) {
+	b, err := json.Marshal(s.Members)
+	if err != nil {
+		return nil, fmt.Errorf("Set.MarshalJSON: %w", err)
+	}
+	return b, nil
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (s *Set[M]) UnmarshalJSON(b []byte) error {
+	var m []M
+	err := json.Unmarshal(b, &m)
+	if err != nil {
+		return fmt.Errorf("Set.UnmarshalJSON: %w", err)
+	}
+	*s = New(m...)
+	return nil
+}
+
+// MarshalText implements the encoding.TextMarshaler interface.
+func (s Set[M]) MarshalText() ([]byte, error) {
+	b, err := json.Marshal(s.Members)
+	if err != nil {
+		return nil, fmt.Errorf("Set.MarshalText: %w", err)
+	}
+	return b, nil
+}
+
+// UnmarshalText implements the encoding.TextUnmarshaler interface.
+func (s *Set[M]) UnmarshalText(b []byte) error {
+	var m []M
+	err := json.Unmarshal(b, &m)
+	if err != nil {
+		return fmt.Errorf("Set.TextUnmarshaler: %w", err)
+	}
+	*s = New(m...)
+	return nil
 }
 
 // Diff returns s1 - s2.

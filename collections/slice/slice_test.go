@@ -369,3 +369,37 @@ func ExampleGroupOrder() {
 	// [{2 3}]
 	// [{1 1} {1 2}]
 }
+
+func TestMin(t *testing.T) {
+	fmt.Println(Min(10, 0, 1))
+	fmt.Println(Min(1))
+	// Output:
+	// 0
+	// 1
+}
+
+func TestMin_Panic(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Error("must panic")
+		}
+	}()
+	_ = Min[int]()
+}
+
+func TestMax(t *testing.T) {
+	fmt.Println(Max(10, 0, 1))
+	fmt.Println(Max(1))
+	// Output:
+	// 10
+	// 1
+}
+
+func TestMax_Panic(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Error("must panic")
+		}
+	}()
+	_ = Max[int]()
+}

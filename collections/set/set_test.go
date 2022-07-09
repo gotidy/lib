@@ -1,6 +1,7 @@
 package set
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"sort"
@@ -454,13 +455,13 @@ func ExampleSet_String() {
 	fmt.Println(New[int]())
 	fmt.Println(New("a"))
 	// Output:
-	// {}
-	// {a}
+	// []
+	// [a]
 }
 
 func TestSetGoString(t *testing.T) {
 	fmt.Printf("%#v", New("a"))
-	// Output: {"a"}
+	// Output: ["a"]
 }
 
 func ExampleSet_Equal() {
@@ -487,4 +488,44 @@ func ExampleSet_Members() {
 	fmt.Println(m)
 	// Output:
 	// [1 2 3]
+}
+
+func TestSet_MarshalJSON(t *testing.T) {
+	b, _ := json.Marshal(New(3))
+	fmt.Println(b)
+	// Output: ["a"]
+}
+
+func TestSet_UnmarshalJSON(t *testing.T) {
+	var s Set[int]
+	_ = json.Unmarshal([]byte("[2, 1, 3]"), &s)
+	fmt.Println(New(2, 1, 3).Equal(s))
+	// Output: true
+}
+
+func TestSet_UnmarshalJSON_Error(t *testing.T) {
+	var s Set[int]
+	err := json.Unmarshal([]byte("2, 1, 3]"), &s)
+	fmt.Println(err != nil)
+	// Output: true
+}
+
+func TestSet_MarshalText(t *testing.T) {
+	b, _ := New(3).MarshalText()
+	fmt.Println(b)
+	// Output: ["a"]
+}
+
+func TestSet_UnmarshalText(t *testing.T) {
+	var s Set[int]
+	_ = (&s).UnmarshalText([]byte("[2, 1, 3]"))
+	fmt.Println(New(2, 1, 3).Equal(s))
+	// Output: true
+}
+
+func TestSet_UnmarshalText_Error(t *testing.T) {
+	var s Set[int]
+	err := (&s).UnmarshalText([]byte("2, 1, 3]"))
+	fmt.Println(err != nil)
+	// Output: true
 }

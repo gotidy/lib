@@ -13,6 +13,10 @@
 - [Slice](collections/slice/README.md)
 - [Set](collections/set/README.md)
 
+## [Math](math/README.md)
+
+## [Constraints](constraints/README.md)
+
 ## Installation
 
 ```sh

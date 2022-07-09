@@ -5,6 +5,8 @@ import (
 	"sort"
 
 	"github.com/gotidy/lib/collections/set"
+	"github.com/gotidy/lib/constraints"
+	"github.com/gotidy/lib/math"
 )
 
 // Index returns the index of the first instance of v in s, or -1 if v is not present in s.
@@ -186,4 +188,26 @@ func GroupOrder[T any, K comparable](s []T, key func(T) K, less func(s []T, i, j
 // Clone slice.
 func Clone[T any](s []T) []T {
 	return append([]T(nil), s...)
+}
+
+// Min returns the minimum value of the slice.
+func Min[T constraints.Ordered](s ...T) T {
+	if len(s) == 0 {
+		panic("count of items must be 1 or more")
+	}
+	if len(s) == 1 {
+		return s[0]
+	}
+	return Reduce(s[1:], s[0], math.Min[T])
+}
+
+// Max returns the maximum value of the slice.
+func Max[T constraints.Ordered](s ...T) T {
+	if len(s) == 0 {
+		panic("count of items must be 1 or more")
+	}
+	if len(s) == 1 {
+		return s[0]
+	}
+	return Reduce(s[1:], s[0], math.Max[T])
 }
