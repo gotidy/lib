@@ -492,7 +492,7 @@ func ExampleSet_Members() {
 
 func ExampleSet_MarshalJSON() {
 	b, _ := json.Marshal(New("a"))
-	fmt.Println(b)
+	fmt.Println(string(b))
 	// Output: ["a"]
 }
 
@@ -511,8 +511,8 @@ func ExampleSet_UnmarshalJSON_Error() {
 }
 
 func ExampleSet_MarshalText() {
-	b, _ := New(3).MarshalText()
-	fmt.Println(b)
+	b, _ := New("a").MarshalText()
+	fmt.Println(string(b))
 	// Output: ["a"]
 }
 
