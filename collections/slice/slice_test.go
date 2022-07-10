@@ -370,7 +370,7 @@ func ExampleGroupOrder() {
 	// [{1 1} {1 2}]
 }
 
-func ExampleMin(t *testing.T) {
+func ExampleMin() {
 	fmt.Println(Min(10, 0, 1))
 	fmt.Println(Min(1))
 	// Output:
@@ -387,7 +387,7 @@ func TestMin_Panic(t *testing.T) {
 	_ = Min[int]()
 }
 
-func ExampleMax(t *testing.T) {
+func ExampleMax() {
 	fmt.Println(Max(10, 0, 1))
 	fmt.Println(Max(1))
 	// Output:

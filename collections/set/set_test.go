@@ -459,7 +459,7 @@ func ExampleSet_String() {
 	// [a]
 }
 
-func ExampleSetGoString(t *testing.T) {
+func ExampleSetGoString() {
 	fmt.Printf("%#v", New("a"))
 	// Output: ["a"]
 }
@@ -490,40 +490,40 @@ func ExampleSet_Members() {
 	// [1 2 3]
 }
 
-func ExampleSet_MarshalJSON(t *testing.T) {
+func ExampleSet_MarshalJSON() {
 	b, _ := json.Marshal(New(3))
 	fmt.Println(b)
 	// Output: ["a"]
 }
 
-func ExampleSet_UnmarshalJSON(t *testing.T) {
+func ExampleSet_UnmarshalJSON() {
 	var s Set[int]
 	_ = json.Unmarshal([]byte("[2, 1, 3]"), &s)
 	fmt.Println(New(2, 1, 3).Equal(s))
 	// Output: true
 }
 
-func ExampleSet_UnmarshalJSON_Error(t *testing.T) {
+func ExampleSet_UnmarshalJSON_Error() {
 	var s Set[int]
 	err := json.Unmarshal([]byte("2, 1, 3]"), &s)
 	fmt.Println(err != nil)
 	// Output: true
 }
 
-func ExampleSet_MarshalText(t *testing.T) {
+func ExampleSet_MarshalText() {
 	b, _ := New(3).MarshalText()
 	fmt.Println(b)
 	// Output: ["a"]
 }
 
-func ExampleSet_UnmarshalText(t *testing.T) {
+func ExampleSet_UnmarshalText() {
 	var s Set[int]
 	_ = (&s).UnmarshalText([]byte("[2, 1, 3]"))
 	fmt.Println(New(2, 1, 3).Equal(s))
 	// Output: true
 }
 
-func ExampleSet_UnmarshalText_Error(t *testing.T) {
+func ExampleSet_UnmarshalText_Error() {
 	var s Set[int]
 	err := (&s).UnmarshalText([]byte("2, 1, 3]"))
 	fmt.Println(err != nil)
