@@ -7,18 +7,28 @@
 [godev]: https://pkg.go.dev/github.com/gotidy/lib
 [goreport]: https://goreportcard.com/report/github.com/gotidy/lib
 
-## [Collections](collections/README.md)
+## Installation
+
+Required 1.18 or later version of Go.
+
+```sh
+go get -u github.com/gotidy/lib
+```
+
+## Documentation
+
+### [Collections](collections/README.md)
 
 - [Map](collections/maps/README.md)
 - [Slice](collections/slice/README.md)
 - [Set](collections/set/README.md)
 
-## [Math](math/README.md)
+### [Math](math/README.md)
 
-## [Constraints](constraints/README.md)
+### [Constraints](constraints/README.md)
 
-## Installation
+### [Ptr](ptr/README.md)
 
-```sh
-go get -u github.com/gotidy/lib
-```
+## License
+
+[Apache 2.0](https://github.com/gotidy/lib/blob/master/LICENSE)
