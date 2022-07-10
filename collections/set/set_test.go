@@ -491,7 +491,7 @@ func ExampleSet_Members() {
 }
 
 func ExampleSet_MarshalJSON() {
-	b, _ := json.Marshal(New(3))
+	b, _ := json.Marshal(New("a"))
 	fmt.Println(b)
 	// Output: ["a"]
 }

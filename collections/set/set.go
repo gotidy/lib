@@ -176,7 +176,7 @@ func (s Set[M]) GoString() string {
 
 // MarshalJSON implements the json.Marshaler interface.
 func (s Set[M]) MarshalJSON() ([]byte, error) {
-	b, err := json.Marshal(s.Members)
+	b, err := json.Marshal(s.Members())
 	if err != nil {
 		return nil, fmt.Errorf("Set.MarshalJSON: %w", err)
 	}
@@ -196,7 +196,7 @@ func (s *Set[M]) UnmarshalJSON(b []byte) error {
 
 // MarshalText implements the encoding.TextMarshaler interface.
 func (s Set[M]) MarshalText() ([]byte, error) {
-	b, err := json.Marshal(s.Members)
+	b, err := json.Marshal(s.Members())
 	if err != nil {
 		return nil, fmt.Errorf("Set.MarshalText: %w", err)
 	}
