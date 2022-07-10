@@ -1,5 +1,7 @@
 # lib
 
+Library based on generics. Slice, map helpers, set type, mathematic functions, pointer helpers.
+
 [![GoDev](https://img.shields.io/static/v1?label=godev&message=reference&color=00add8)][godev] [![Go Report Card](https://goreportcard.com/badge/github.com/gotidy/lib)][goreport]
 
 <!-- [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go) -->
