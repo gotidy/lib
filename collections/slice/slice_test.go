@@ -6,6 +6,8 @@ import (
 	"sort"
 	"strconv"
 	"testing"
+
+	"github.com/gotidy/lib/ptr"
 )
 
 func TestIndexExists(t *testing.T) {
@@ -123,6 +125,24 @@ func TestMap(t *testing.T) {
 	expected := []string{"0", "1", "2", "3", "4", "5"}
 
 	res := Map(s, strconv.Itoa)
+	if !reflect.DeepEqual(res, expected) {
+		t.Errorf("expected %+v, actual %+v", expected, res)
+	}
+}
+
+func TestMapIndexed(t *testing.T) {
+	s := []int{0, 1, 2, 3, 4, 5}
+	expected := []string{"0", "1", "2", "3", "4", "5"}
+
+	var indexes, expectedIndexes []int
+	res := MapIndexed(s, func(i, v int) string {
+		indexes = append(indexes, i)
+		expectedIndexes = append(expectedIndexes, len(expectedIndexes))
+		return strconv.Itoa(v)
+	})
+	if !reflect.DeepEqual(indexes, expectedIndexes) {
+		t.Errorf("expected indexes %+v, actual %+v", expectedIndexes, indexes)
+	}
 	if !reflect.DeepEqual(res, expected) {
 		t.Errorf("expected %+v, actual %+v", expected, res)
 	}
@@ -402,4 +422,76 @@ func TestMax_Panic(t *testing.T) {
 		}
 	}()
 	_ = Max[int]()
+}
+
+func TestNew(t *testing.T) {
+	expected := []*int{new(int), new(int), new(int), new(int), new(int)}
+	result := New[int](len(expected))
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("expected %+v, actual %+v", expected, result)
+	}
+}
+
+// func TestNewUnsafe(t *testing.T) {
+// 	expected := []*int{new(int), new(int), new(int), new(int), new(int)}
+// 	result := NewUnsafe[int](len(expected))
+// 	if !reflect.DeepEqual(result, expected) {
+// 		t.Errorf("expected %+v, actual %+v", expected, result)
+// 	}
+// }
+
+func TestNewInit(t *testing.T) {
+	expected := []*int{ptr.Of(0), ptr.Of(1), ptr.Of(2), ptr.Of(3), ptr.Of(4)}
+	result := NewInit(len(expected), func(i int, t *int) { *t = i })
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("expected %+v, actual %+v", expected, result)
+	}
+}
+
+func BenchmarkNew(b *testing.B) {
+	type t struct{ i, j, k, l, m int }
+
+	for size := 2; size <= 1024; size *= size {
+		b.Run("New_"+strconv.Itoa(size), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				New[t](size)
+			}
+		})
+
+		// b.Run("New_Unsafe_"+strconv.Itoa(size), func(b *testing.B) {
+		// 	for i := 0; i < b.N; i++ {
+		// 		NewUnsafe[t](size)
+		// 	}
+		// })
+
+		b.Run("Classic_"+strconv.Itoa(size), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				s := make([]*t, size)
+				for i := range s {
+					s[i] = &t{}
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkNewInit(b *testing.B) {
+	type t struct{ i, j, k, l, m int }
+
+	for size := 2; size <= 1024; size *= size {
+		b.Run("New_"+strconv.Itoa(size), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				NewInit(size, func(i int, v *t) { *v = t{1, 2, 3, 4, 5} })
+			}
+		})
+
+		b.Run("Classic_"+strconv.Itoa(size), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				s := make([]*t, size)
+				for i := range s {
+					s[i] = &t{1, 2, 3, 4, 5}
+				}
+			}
+		})
+	}
 }

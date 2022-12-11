@@ -66,6 +66,18 @@ func Map[T1, T2 any](s []T1, f func(T1) T2) []T2 {
 	return result
 }
 
+// MapIndexed turns a []T1 to a []T2 using a mapping function.
+// This function has two type parameters, T1 and T2.
+// This works with slices of any type.
+func MapIndexed[T1, T2 any](s []T1, f func(int, T1) T2) []T2 {
+	result := make([]T2, len(s))
+	for i, v := range s {
+		result[i] = f(i, v)
+	}
+
+	return result
+}
+
 // Filter filters values from a slice using a filter function.
 // It returns a new slice with only the elements of s
 // for which f returned true.
@@ -211,3 +223,66 @@ func Max[T constraints.Ordered](s ...T) T {
 	}
 	return Reduce(s[1:], s[0], math.Max[T])
 }
+
+// New allocate fast slice of pointers of specified type.
+func New[T any](size int) []*T {
+	switch size {
+	case 0:
+		return nil
+	case 1:
+		return []*T{new(T)}
+	default:
+		t := make([]*T, size)
+		tt := make([]T, size)
+		for i := range t {
+			t[i] = &tt[i]
+		}
+		return t
+	}
+}
+
+// NewInit allocate fast the slice of pointers of specified type and initializes it.
+func NewInit[T any](size int, init func(i int, t *T)) []*T {
+	switch size {
+	case 0:
+		return nil
+	case 1:
+		p := new(T)
+		init(0, p)
+		return []*T{p}
+	default:
+		t := make([]*T, size)
+		tt := make([]T, size)
+		for i := range t {
+			p := &tt[i]
+			init(i, p)
+			t[i] = p
+		}
+		return t
+	}
+}
+
+// // NewUnsafe allocate fast slice of pointers of specified type.
+// func NewUnsafe[T any](size int) []*T {
+// 	switch size {
+// 	case 0:
+// 		return nil
+// 	default:
+// 		var vpT *T
+// 		var vT T
+// 		ptrSize := int(unsafe.Sizeof(vpT)) * size
+// 		typeSize := int(unsafe.Sizeof(vT)) * size
+
+// 		b := make([]byte, ptrSize+typeSize) // allocate memory for slice of pointers and slice of data.
+
+// 		firstPtrItem := (**T)(unsafe.Pointer(&b[0]))
+// 		firstTypeItem := (*T)(unsafe.Pointer(&b[ptrSize])) // Data is stored after an slice of pointers.
+
+// 		t := unsafe.Slice(firstPtrItem, size)
+// 		tt := unsafe.Slice(firstTypeItem, size)
+// 		for i := range t {
+// 			t[i] = &tt[i]
+// 		}
+// 		return t
+// 	}
+// }
