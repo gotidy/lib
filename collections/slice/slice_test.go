@@ -1,6 +1,7 @@
 package slice
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"sort"
@@ -494,4 +495,28 @@ func BenchmarkNewInit(b *testing.B) {
 			}
 		})
 	}
+}
+
+func ExampleBatch() {
+	const size = 4
+	s := []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	var results [][]int
+	err := Batch(s, size, func(s []int) error {
+		results = append(results, s)
+		return nil
+	})
+
+	fmt.Println(err)
+	fmt.Println(results)
+
+	err = Batch(s, size, func(s []int) error {
+		return errors.New("oops")
+	})
+
+	fmt.Println(err)
+
+	// Output:
+	// <nil>
+	// [[1 2 3 4] [5 6 7 8] [9]]
+	// oops
 }

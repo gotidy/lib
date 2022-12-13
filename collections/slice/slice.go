@@ -286,3 +286,19 @@ func NewInit[T any](size int, init func(i int, t *T)) []*T {
 // 		return t
 // 	}
 // }
+
+// Batch split the slice to batches and call the callback function with the every batch.
+func Batch[T any](s []T, size int, f func([]T) error) error {
+	l := len(s)
+	for low := 0; low < l; low += size {
+		high := low + size
+		if high > l {
+			high = l
+		}
+		err := f(s[low:high])
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
