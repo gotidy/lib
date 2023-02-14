@@ -31,7 +31,7 @@ func Diff[K comparable, V1, V2 any](m1 map[K]V1, m2 map[K]V2) map[K]V1 {
 // DiffKeys returns m1 - m2.
 func DiffKeys[K comparable, V any](m map[K]V, keys []K) map[K]V {
 	result := make(map[K]V)
-	s := set.New(keys...)
+	s := set.Of(keys...)
 	for k, v := range m {
 		if !s.Has(k) {
 			result[k] = v

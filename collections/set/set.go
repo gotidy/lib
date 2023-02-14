@@ -9,8 +9,8 @@ import (
 // Set.
 type Set[M comparable] map[M]struct{}
 
-// New creates a new Set of members.
-func New[M comparable](members ...M) Set[M] {
+// Of creates a new Set of members.
+func Of[M comparable](members ...M) Set[M] {
 	result := make(Set[M])
 	for _, member := range members {
 		result[member] = struct{}{}
@@ -18,8 +18,8 @@ func New[M comparable](members ...M) Set[M] {
 	return result
 }
 
-// NewFromMapKeys creates a new Set of keys of the given map.
-func NewFromMapKeys[M comparable, V any](m map[M]V) Set[M] {
+// OfMapKeys creates a new Set of keys of the given map.
+func OfMapKeys[M comparable, V any](m map[M]V) Set[M] {
 	result := make(Set[M])
 	for key := range m {
 		result[key] = struct{}{}
@@ -27,8 +27,8 @@ func NewFromMapKeys[M comparable, V any](m map[M]V) Set[M] {
 	return result
 }
 
-// NewFromSliceFunc creates a new Set of keys of the given map.
-func NewFromSliceFunc[M comparable, V any](s []V, f func(v V) M) Set[M] {
+// FromSliceFunc creates a new Set of members mapped from specified slice.
+func FromSliceFunc[M comparable, V any](s []V, f func(v V) M) Set[M] {
 	result := make(Set[M])
 	for _, v := range s {
 		result[f(v)] = struct{}{}
@@ -190,7 +190,7 @@ func (s *Set[M]) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return fmt.Errorf("Set.UnmarshalJSON: %w", err)
 	}
-	*s = New(m...)
+	*s = Of(m...)
 	return nil
 }
 
@@ -210,13 +210,13 @@ func (s *Set[M]) UnmarshalText(b []byte) error {
 	if err != nil {
 		return fmt.Errorf("Set.TextUnmarshaler: %w", err)
 	}
-	*s = New(m...)
+	*s = Of(m...)
 	return nil
 }
 
 // Diff returns s1 - s2.
 func Diff[M comparable](s1, s2 Set[M]) Set[M] {
-	result := New[M]()
+	result := Of[M]()
 	for member := range s1 {
 		if !s2.Has(member) {
 			result[member] = struct{}{}
@@ -227,7 +227,7 @@ func Diff[M comparable](s1, s2 Set[M]) Set[M] {
 
 // Union returns s1 + s2.
 func Union[M comparable](s1, s2 Set[M]) Set[M] {
-	result := New[M]()
+	result := Of[M]()
 	for member := range s1 {
 		result[member] = struct{}{}
 	}
@@ -239,7 +239,7 @@ func Union[M comparable](s1, s2 Set[M]) Set[M] {
 
 // Intersect returns s1 members that is contained in s2.
 func Intersect[M comparable](s1, s2 Set[M]) Set[M] {
-	result := New[M]()
+	result := Of[M]()
 	for member := range s1 {
 		if s2.Has(member) {
 			result[member] = struct{}{}

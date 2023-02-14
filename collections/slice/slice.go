@@ -109,7 +109,7 @@ func Diff[T comparable](s1, s2 []T) []T {
 	}
 
 	var result []T
-	s := set.New(s2...)
+	s := set.Of(s2...)
 	for _, v := range s1 {
 		if !s.Has(v) {
 			result = append(result, v)
@@ -121,8 +121,8 @@ func Diff[T comparable](s1, s2 []T) []T {
 // SymmetricDiff gets the symmetric difference of two sets and gives a set of elements, which are in either of the sets and not in their intersection.
 func SymmetricDiff[T comparable](s1, s2 []T) []T {
 	var result []T
-	set1 := set.New(s1...)
-	set2 := set.New(s2...)
+	set1 := set.Of(s1...)
+	set2 := set.Of(s2...)
 	for _, v := range s1 {
 		if !set2.Has(v) {
 			result = append(result, v)
@@ -146,7 +146,7 @@ func Intersect[T comparable](s1, s2 []T) []T {
 	if len(s1) < len(s2) {
 		s1, s2 = s2, s1
 	}
-	s := set.New(s2...)
+	s := set.Of(s2...)
 	for _, v := range s1 {
 		if s.Has(v) {
 			result = append(result, v)
@@ -301,4 +301,23 @@ func Batch[T any](s []T, size int, f func([]T) error) error {
 		}
 	}
 	return nil
+}
+
+// ConvertNumbers converts slices of numbers of one number type to slices of another numbers type.
+func ConvertNumbers[T, V constraints.Number](t []T) []V {
+	v := make([]V, len(t))
+	for i, t := range t {
+		v[i] = V(t)
+	}
+	return v
+}
+
+// Contains checks that the slice contains the specified value.
+func Contains[T comparable](s T, in []T) bool {
+	for _, v := range in {
+		if s == v {
+			return true
+		}
+	}
+	return false
 }

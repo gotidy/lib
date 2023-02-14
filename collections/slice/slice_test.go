@@ -509,14 +509,25 @@ func ExampleBatch() {
 	fmt.Println(err)
 	fmt.Println(results)
 
+	// with error
 	err = Batch(s, size, func(s []int) error {
 		return errors.New("oops")
 	})
 
 	fmt.Println(err)
 
+	// empty
+	results = nil
+	_ = Batch(nil, size, func(s []int) error {
+		results = append(results, s)
+		return nil
+	})
+
+	fmt.Println(results)
+
 	// Output:
 	// <nil>
 	// [[1 2 3 4] [5 6 7 8] [9]]
 	// oops
+	// []
 }
