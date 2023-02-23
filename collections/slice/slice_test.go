@@ -450,7 +450,7 @@ func TestNewInit(t *testing.T) {
 }
 
 func BenchmarkNew(b *testing.B) {
-	type t struct{ i, j, k, l, m int }
+	type t struct{ I, J, K, L, M int }
 
 	for size := 2; size <= 1024; size *= size {
 		b.Run("New_"+strconv.Itoa(size), func(b *testing.B) {

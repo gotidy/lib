@@ -459,7 +459,7 @@ func ExampleSet_String() {
 	// [a]
 }
 
-func ExampleSetGoString() {
+func ExampleSet_GoString() {
 	fmt.Printf("%#v", Of("a"))
 	// Output: ["a"]
 }
@@ -498,16 +498,18 @@ func ExampleSet_MarshalJSON() {
 
 func ExampleSet_UnmarshalJSON() {
 	var s Set[int]
+
+	// OK.
 	_ = json.Unmarshal([]byte("[2, 1, 3]"), &s)
 	fmt.Println(Of(2, 1, 3).Equal(s))
-	// Output: true
-}
 
-func ExampleSet_UnmarshalJSON_Error() {
-	var s Set[int]
+	// Return error.
 	err := json.Unmarshal([]byte("2, 1, 3]"), &s)
 	fmt.Println(err != nil)
-	// Output: true
+
+	// Output:
+	// true
+	// true
 }
 
 func ExampleSet_MarshalText() {
@@ -518,14 +520,16 @@ func ExampleSet_MarshalText() {
 
 func ExampleSet_UnmarshalText() {
 	var s Set[int]
+
+	// OK.
 	_ = (&s).UnmarshalText([]byte("[2, 1, 3]"))
 	fmt.Println(Of(2, 1, 3).Equal(s))
-	// Output: true
-}
 
-func ExampleSet_UnmarshalText_Error() {
-	var s Set[int]
+	// Return err.
 	err := (&s).UnmarshalText([]byte("2, 1, 3]"))
 	fmt.Println(err != nil)
-	// Output: true
+
+	// Output:
+	// true
+	// true
 }
