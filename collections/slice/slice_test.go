@@ -531,3 +531,9 @@ func ExampleBatch() {
 	// oops
 	// []
 }
+
+func ExampleMerge() {
+	fmt.Println(Merge([]int{1, 2, 3, 4}, []int{4, 5, 6}, nil, []int{5, 7}))
+	// Output:
+	// [1 2 3 4 4 5 6 5 7]
+}

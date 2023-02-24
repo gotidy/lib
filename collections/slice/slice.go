@@ -92,6 +92,21 @@ func Filter[T any](s []T, f func(T) bool) []T {
 	return r
 }
 
+// FilterMap first filters values from a slice using a filter function and
+// then map them.
+// It returns a new slice with only the mapped elements of s
+// for which filter returned true.
+func FilterMap[T1, T2 any](s []T1, filter func(T1) bool, mapper func(T1) T2) []T2 {
+	var r []T2
+	for _, v := range s {
+		if filter(v) {
+			r = append(r, mapper(v))
+		}
+	}
+
+	return r
+}
+
 // Reduce reduces a []T to a single value using a reduction function.
 func Reduce[T, R any](s []T, initializer R, f func(R, T) R) R {
 	r := initializer
@@ -153,6 +168,24 @@ func Intersect[T comparable](s1, s2 []T) []T {
 		}
 	}
 	return result
+}
+
+// Merge slices into one.
+func Merge[T any](ss ...[]T) []T {
+	if len(ss) == 0 {
+		return nil
+	}
+
+	l := 0
+	for _, s := range ss {
+		l += len(s)
+	}
+
+	res := make([]T, 0, l)
+	for _, s := range ss {
+		res = append(res, s...)
+	}
+	return res
 }
 
 // Each iterates through map values.
