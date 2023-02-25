@@ -537,3 +537,16 @@ func ExampleMerge() {
 	// Output:
 	// [1 2 3 4 4 5 6 5 7]
 }
+
+func ExampleUnion() {
+	fmt.Println(Union([]int{1, 2, 3, 4}, []int{4, 5, 6}, []int{5, 7}))
+	fmt.Println(Union([]int{4, 5, 6}, []int{1, 2, 3, 4}, []int{5, 7}))
+	fmt.Println(Union(nil, []int{4, 5, 6}, nil))
+	fmt.Println(Union([]string(nil)))
+
+	// Output:
+	// [1 2 3 4 5 6 7]
+	// [4 5 6 1 2 3 7]
+	// [4 5 6]
+	// []
+}

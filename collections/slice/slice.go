@@ -170,6 +170,44 @@ func Intersect[T comparable](s1, s2 []T) []T {
 	return result
 }
 
+// Union slices into one. Duplicates is removed. Order of items in slices is preserved.
+func Union[T comparable](ss ...[]T) []T {
+	if len(ss) == 0 {
+		return nil
+	}
+	if len(ss) == 1 {
+		return ss[0]
+	}
+	var result []T
+	var count, max int
+	for _, s := range ss {
+		l := len(s)
+		if l == 0 {
+			continue
+		}
+		count++
+		if l > max {
+			max = l
+			result = s
+		}
+	}
+	if count == 1 {
+		return result
+	}
+
+	set := make(set.Set[T], max)
+	result = make([]T, 0, max)
+	for _, s := range ss {
+		for _, item := range s {
+			if set.TryAdd(item) {
+				result = append(result, item)
+			}
+		}
+	}
+
+	return result
+}
+
 // Merge slices into one.
 func Merge[T any](ss ...[]T) []T {
 	if len(ss) == 0 {

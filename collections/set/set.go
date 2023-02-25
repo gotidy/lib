@@ -7,6 +7,12 @@ import (
 )
 
 // Set.
+//
+//	s := make(Set[M])
+//
+// Or allocate with enough space to hold the specified number of members.
+//
+//	s := make(Set[M], 10)
 type Set[M comparable] map[M]struct{}
 
 // Of creates a new Set of members.
@@ -64,6 +70,16 @@ func (s Set[M]) Add(members ...M) Set[M] {
 		s[member] = struct{}{}
 	}
 	return s
+}
+
+// TryAdd checks that the member is exists and adds it.
+// True is returned if the member was not in the set.
+func (s Set[M]) TryAdd(member M) bool {
+	if s.Has(member) {
+		return false
+	}
+	s[member] = struct{}{}
+	return true
 }
 
 // Delete members from set.
