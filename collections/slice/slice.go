@@ -392,3 +392,17 @@ func Contains[T comparable](s T, in []T) bool {
 	}
 	return false
 }
+
+// Equal compare two slices.
+func Equal[T comparable](s1, s2 []T) bool {
+	if len(s1) != len(s2) {
+		return false
+	}
+
+	for i, s := range s1 {
+		if s != s2[i] {
+			return false
+		}
+	}
+	return true
+}
