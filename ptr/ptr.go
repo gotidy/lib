@@ -51,3 +51,14 @@ func ConvertNumber[T, V constraints.Number](t *T) *V {
 	v := V(*t)
 	return &v
 }
+
+// Copy returns a copy of the pointered data.
+func Copy[T any](t *T) *T {
+	r := *t
+	return &r
+}
+
+// Empty checks that value is nil or equal zero value.
+func Empty[T comparable](t *T) bool {
+	return t == nil || *t == Zero[T]()
+}
