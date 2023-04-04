@@ -449,6 +449,15 @@ func TestNewInit(t *testing.T) {
 	}
 }
 
+func TestNewFrom(t *testing.T) {
+	src := []int{1, 2, 3, 4, 5}
+	expected := []*int{ptr.Of(src[0]), ptr.Of(src[1]), ptr.Of(src[2]), ptr.Of(src[3]), ptr.Of(src[4])}
+	result := NewFrom(src, func(dst *int, src int) { *dst = src })
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("expected %+v, actual %+v", expected, result)
+	}
+}
+
 func BenchmarkNew(b *testing.B) {
 	type t struct{ I, J, K, L, M int }
 

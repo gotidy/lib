@@ -313,7 +313,7 @@ func New[T any](size int) []*T {
 }
 
 // NewInit allocate fast the slice of pointers of specified type and initializes it.
-func NewInit[T any](size int, init func(i int, t *T)) []*T {
+func NewInit[T any](size int, init func(i int, item *T)) []*T {
 	switch size {
 	case 0:
 		return nil
@@ -327,6 +327,27 @@ func NewInit[T any](size int, init func(i int, t *T)) []*T {
 		for i := range t {
 			p := &tt[i]
 			init(i, p)
+			t[i] = p
+		}
+		return t
+	}
+}
+
+// NewFrom allocate fast the slice of pointers of specified type and initializes it.
+func NewFrom[K, T any](source []K, init func(dst *T, src K)) []*T {
+	switch size := len(source); size {
+	case 0:
+		return nil
+	case 1:
+		p := new(T)
+		init(p, source[0])
+		return []*T{p}
+	default:
+		t := make([]*T, size)
+		tt := make([]T, size)
+		for i := range t {
+			p := &tt[i]
+			init(p, source[i])
 			t[i] = p
 		}
 		return t
