@@ -33,11 +33,22 @@ func OfMapKeys[M comparable, V any](m map[M]V) Set[M] {
 	return result
 }
 
-// FromSliceFunc creates a new Set of members mapped from specified slice.
-func FromSliceFunc[M comparable, V any](s []V, f func(v V) M) Set[M] {
+// FromSlice creates a new Set of members mapped from specified slice.
+func FromSlice[M comparable, V any](s []V, f func(v V) M) Set[M] {
 	result := make(Set[M])
 	for _, v := range s {
 		result[f(v)] = struct{}{}
+	}
+	return result
+}
+
+// ToSlice map set members to slice.
+func ToSlice[T comparable, K any](s Set[T], f func(m T) K) []K {
+	result := make([]K, len(s))
+	i := 0
+	for m := range s {
+		result[i] = f(m)
+		i++
 	}
 	return result
 }

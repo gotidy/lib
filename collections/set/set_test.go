@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"sort"
+	"strconv"
 	"testing"
 )
 
@@ -71,7 +72,7 @@ func TestNewFromMapKeys(t *testing.T) {
 	}
 }
 
-func TestNewFromSliceFunc(t *testing.T) {
+func TestNewFromSlice(t *testing.T) {
 	type T struct {
 		Name string
 	}
@@ -93,7 +94,7 @@ func TestNewFromSliceFunc(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := FromSliceFunc(tt.args.s, tt.args.f); !reflect.DeepEqual(got, tt.want) {
+			if got := FromSlice(tt.args.s, tt.args.f); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewFromSliceFunc() = %v, want %v", got, tt.want)
 			}
 		})
@@ -532,4 +533,13 @@ func ExampleSet_UnmarshalText() {
 	// Output:
 	// true
 	// true
+}
+
+func ExampleToSlice() {
+	s := ToSlice(Of(1, 2, 3), strconv.Itoa)
+	sort.Strings(s)
+	fmt.Printf("%#v", s)
+
+	// Output:
+	// []string{"1", "2", "3"}
 }
