@@ -354,31 +354,6 @@ func NewFrom[K, T any](source []K, init func(dst *T, src K)) []*T {
 	}
 }
 
-// // NewUnsafe allocate fast slice of pointers of specified type.
-// func NewUnsafe[T any](size int) []*T {
-// 	switch size {
-// 	case 0:
-// 		return nil
-// 	default:
-// 		var vpT *T
-// 		var vT T
-// 		ptrSize := int(unsafe.Sizeof(vpT)) * size
-// 		typeSize := int(unsafe.Sizeof(vT)) * size
-
-// 		b := make([]byte, ptrSize+typeSize) // allocate memory for slice of pointers and slice of data.
-
-// 		firstPtrItem := (**T)(unsafe.Pointer(&b[0]))
-// 		firstTypeItem := (*T)(unsafe.Pointer(&b[ptrSize])) // Data is stored after an slice of pointers.
-
-// 		t := unsafe.Slice(firstPtrItem, size)
-// 		tt := unsafe.Slice(firstTypeItem, size)
-// 		for i := range t {
-// 			t[i] = &tt[i]
-// 		}
-// 		return t
-// 	}
-// }
-
 // Batch split the slice to batches and call the callback function with the every batch.
 func Batch[T any](s []T, size int, f func([]T) error) error {
 	l := len(s)

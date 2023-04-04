@@ -433,14 +433,6 @@ func TestNew(t *testing.T) {
 	}
 }
 
-// func TestNewUnsafe(t *testing.T) {
-// 	expected := []*int{new(int), new(int), new(int), new(int), new(int)}
-// 	result := NewUnsafe[int](len(expected))
-// 	if !reflect.DeepEqual(result, expected) {
-// 		t.Errorf("expected %+v, actual %+v", expected, result)
-// 	}
-// }
-
 func TestNewInit(t *testing.T) {
 	expected := []*int{ptr.Of(0), ptr.Of(1), ptr.Of(2), ptr.Of(3), ptr.Of(4)}
 	result := NewInit(len(expected), func(i int, t *int) { *t = i })
