@@ -1,6 +1,10 @@
 package ptr
 
-import "github.com/gotidy/lib/constraints"
+import (
+	"fmt"
+
+	"github.com/gotidy/lib/constraints"
+)
 
 // Of returns pointer to value.
 func Of[T any](v T) *T {
@@ -43,6 +47,11 @@ func Equal[T comparable](v1, v2 *T) bool {
 	return v1 == v2 || v1 != nil && v2 != nil && *v1 == *v2
 }
 
+// EqualValue compare the value of pointer with the value.
+func EqualValue[T comparable](p *T, v T) bool {
+	return p != nil && *p == v
+}
+
 // ConvertNumber  the pointer of number of one type to another type.
 func ConvertNumber[T, V constraints.Number](t *T) *V {
 	if t == nil {
@@ -61,4 +70,28 @@ func Copy[T any](t *T) *T {
 // Empty checks that value is nil or equal zero value.
 func Empty[T comparable](t *T) bool {
 	return t == nil || *t == Zero[T]()
+}
+
+// Str return value or empty string if value if nil.
+func Str[T any](v *T) string {
+	if v == nil {
+		return ""
+	}
+	i := interface{}(v)
+	if i, ok := i.(interface{ String() string }); ok {
+		return i.String()
+	}
+	return fmt.Sprintf("%v", *v)
+}
+
+// StrDef return value or default string if value if nil.
+func StrDef[T any](v *T, def string) string {
+	if v == nil {
+		return def
+	}
+	i := interface{}(v)
+	if i, ok := i.(interface{ String() string }); ok {
+		return i.String()
+	}
+	return fmt.Sprintf("%v", *v)
 }

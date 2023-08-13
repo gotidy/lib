@@ -7,6 +7,7 @@ import (
 	"github.com/gotidy/lib/collections/set"
 	"github.com/gotidy/lib/constraints"
 	"github.com/gotidy/lib/math"
+	"github.com/gotidy/lib/ptr"
 )
 
 // Index returns the index of the first instance of v in s, or -1 if v is not present in s.
@@ -73,6 +74,34 @@ func MapIndexed[T1, T2 any](s []T1, f func(int, T1) T2) []T2 {
 	result := make([]T2, len(s))
 	for i, v := range s {
 		result[i] = f(i, v)
+	}
+
+	return result
+}
+
+// MapFilter turns a []T1 to a []T2 using a mapping function,
+// Values is not placed to result slice when the mapping function return false.
+// The resulting slice may have a smaller size than the original.
+func MapFilter[T1, T2 any](s []T1, f func(T1) (T2, bool)) []T2 {
+	result := make([]T2, 0, len(s))
+	for _, v := range s {
+		if r, ok := f(v); ok {
+			result = append(result, r)
+		}
+	}
+
+	return result
+}
+
+// MapNotNil turns a []*T1 to a []T2 using a mapping function, exclude nil values.
+// This works with slices of any type.
+// The resulting slice may have a smaller size than the original.
+func MapNotNil[T1, T2 any](s []*T1, f func(*T1) T2) []T2 {
+	result := make([]T2, 0, len(s))
+	for _, v := range s {
+		if v != nil {
+			result = append(result, f(v))
+		}
 	}
 
 	return result
@@ -333,6 +362,30 @@ func NewInit[T any](size int, init func(i int, item *T)) []*T {
 	}
 }
 
+// NewInitFilter allocate fast the slice of pointers of specified type and initializes it.
+func NewInitFilter[T any](size int, init func(i int, item *T) bool) []*T {
+	switch size {
+	case 0:
+		return nil
+	case 1:
+		p := new(T)
+		init(0, p)
+		return []*T{p}
+	default:
+		t := make([]*T, size)
+		tt := make([]T, size)
+		outputIndex := 0
+		for i := range t {
+			p := &tt[outputIndex]
+			if ok := init(i, p); ok {
+				t[outputIndex] = p
+				outputIndex++
+			}
+		}
+		return t[:outputIndex]
+	}
+}
+
 // NewFrom allocate fast the slice of pointers of specified type and initializes it.
 func NewFrom[K, T any](source []K, init func(dst *T, src K)) []*T {
 	switch size := len(source); size {
@@ -351,6 +404,31 @@ func NewFrom[K, T any](source []K, init func(dst *T, src K)) []*T {
 			t[i] = p
 		}
 		return t
+	}
+}
+
+// NewFromFilter allocate fast the slice of pointers of specified type and initializes it.
+// It skips output if the init function return false.
+func NewFromFilter[K, T any](source []K, init func(dst *T, src K) bool) []*T {
+	switch size := len(source); size {
+	case 0:
+		return nil
+	case 1:
+		p := new(T)
+		init(p, source[0])
+		return []*T{p}
+	default:
+		t := make([]*T, size)
+		tt := make([]T, size)
+		outputIndex := 0
+		for i := range t {
+			p := &tt[i]
+			if init(p, source[i]) {
+				t[outputIndex] = p
+				outputIndex++
+			}
+		}
+		return t[:outputIndex]
 	}
 }
 
@@ -401,4 +479,71 @@ func Equal[T comparable](s1, s2 []T) bool {
 		}
 	}
 	return true
+}
+
+// Append not nil elements.
+func AppendNotNil[T any](slice []*T, elems ...*T) []*T {
+	if len(elems) == 0 {
+		return slice
+	}
+
+	i := 0
+	for i < len(elems) {
+		if elems[i] != nil {
+			i++
+			continue
+		}
+		if i > 0 {
+			slice = append(slice, elems[:i]...)
+		}
+		if len(elems) == 1 {
+			elems = nil
+			break
+		}
+		elems = elems[i+1:]
+		i = 0
+	}
+	return append(slice, elems...)
+}
+
+// ProcessNotNil process not nil elements.
+func ProcessNotNil[T any](s []*T, f func(*T) error) error {
+	for _, item := range s {
+		if item == nil {
+			continue
+		}
+		if err := f(item); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// ToMap convert slice to map.
+func ToMap[I any, K comparable, T any](items []I, fn func(item I) (K, T)) map[K]T {
+	result := make(map[K]T, len(items))
+	for _, item := range items {
+		k, t := fn(item)
+		result[k] = t
+	}
+	return result
+}
+
+// FromMap extract slice from map.
+func FromMap[I any, K comparable, T any](items map[K]T, fn func(key K, value T) I) []I {
+	result := make([]I, 0, len(items))
+	for key, value := range items {
+		result = append(result, fn(key, value))
+	}
+	return result
+}
+
+// FindFirst item.
+func FindFirst[T any](items []T, filter func(item T) bool) (T, bool) {
+	for _, item := range items {
+		if filter(item) {
+			return item, true
+		}
+	}
+	return ptr.Zero[T](), false
 }

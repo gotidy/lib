@@ -131,6 +131,33 @@ func TestMap(t *testing.T) {
 	}
 }
 
+func TestMapNotNil(t *testing.T) {
+	t.Parallel()
+	s := []*int{ptr.Of(0), nil, ptr.Of(2), ptr.Of(3), nil, ptr.Of(5)}
+	expected := []string{"0", "2", "3", "5"}
+
+	res := MapNotNil(s, func(i *int) string { return strconv.Itoa(*i) })
+	if !reflect.DeepEqual(res, expected) {
+		t.Errorf("expected %+v, actual %+v", expected, res)
+	}
+}
+
+func TestMapFilter(t *testing.T) {
+	t.Parallel()
+	s := []*int{ptr.Of(0), nil, ptr.Of(2), ptr.Of(3), nil, ptr.Of(5)}
+	expected := []string{"0", "2", "3", "5"}
+
+	res := MapFilter(s, func(i *int) (string, bool) {
+		if i == nil {
+			return "", false
+		}
+		return strconv.Itoa(*i), true
+	})
+	if !reflect.DeepEqual(res, expected) {
+		t.Errorf("expected %+v, actual %+v", expected, res)
+	}
+}
+
 func TestMapIndexed(t *testing.T) {
 	s := []int{0, 1, 2, 3, 4, 5}
 	expected := []string{"0", "1", "2", "3", "4", "5"}
@@ -441,6 +468,15 @@ func TestNewInit(t *testing.T) {
 	}
 }
 
+func TestNewInitFilter(t *testing.T) {
+	t.Parallel()
+	s := []*int{ptr.Of(0), ptr.Of(1), ptr.Of(2), ptr.Of(3), ptr.Of(4)}
+	expected := []*int{ptr.Of(0), ptr.Of(2), ptr.Of(4)}
+	result := NewInitFilter(len(s), func(i int, t *int) bool { *t = i; return i%2 == 0 })
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("expected %+v, actual %+v", expected, result)
+	}
+}
 func TestNewFrom(t *testing.T) {
 	src := []int{1, 2, 3, 4, 5}
 	expected := []*int{ptr.Of(src[0]), ptr.Of(src[1]), ptr.Of(src[2]), ptr.Of(src[3]), ptr.Of(src[4])}
@@ -450,6 +486,15 @@ func TestNewFrom(t *testing.T) {
 	}
 }
 
+func TestNewFromFilter(t *testing.T) {
+	t.Parallel()
+	src := []int{0, 1, 2, 3, 4, 5}
+	expected := []*int{ptr.Of(src[0]), ptr.Of(src[2]), ptr.Of(src[4])}
+	result := NewFromFilter(src, func(dst *int, src int) bool { *dst = src; return src%2 == 0 })
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("expected %+v, actual %+v", expected, result)
+	}
+}
 func BenchmarkNew(b *testing.B) {
 	type t struct{ I, J, K, L, M int }
 
@@ -550,4 +595,52 @@ func ExampleUnion() {
 	// [4 5 6 1 2 3 7]
 	// [4 5 6]
 	// []
+}
+
+func TestAppendNotNil(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name      string
+		got, want []*int
+	}{
+		{
+			name: "nil in middle",
+			got:  AppendNotNil([]*int{ptr.Of(1), ptr.Of(2), ptr.Of(3)}, ptr.Of(4), nil, ptr.Of(6), ptr.Of(7), ptr.Of(8), nil, ptr.Of(10)),
+			want: []*int{ptr.Of(1), ptr.Of(2), ptr.Of(3), ptr.Of(4), ptr.Of(6), ptr.Of(7), ptr.Of(8), ptr.Of(10)},
+		},
+		{
+			name: "nil in start and end",
+			got:  AppendNotNil([]*int{ptr.Of(1), ptr.Of(2), ptr.Of(3)}, nil, nil, ptr.Of(6), ptr.Of(7), ptr.Of(8), nil),
+			want: []*int{ptr.Of(1), ptr.Of(2), ptr.Of(3), ptr.Of(6), ptr.Of(7), ptr.Of(8)},
+		},
+		{
+			name: "elements is empty",
+			got:  AppendNotNil([]*int{ptr.Of(1), ptr.Of(2), ptr.Of(3)}),
+			want: []*int{ptr.Of(1), ptr.Of(2), ptr.Of(3)},
+		},
+		{
+			name: "one nil element",
+			got:  AppendNotNil([]*int{ptr.Of(1), ptr.Of(2), ptr.Of(3)}, nil),
+			want: []*int{ptr.Of(1), ptr.Of(2), ptr.Of(3)},
+		},
+		{
+			name: "slice is empty",
+			got:  AppendNotNil(nil, ptr.Of(4), nil, ptr.Of(6)),
+			want: []*int{ptr.Of(4), ptr.Of(6)},
+		},
+		{
+			name: "all empty",
+			got:  AppendNotNil[int](nil),
+			want: nil,
+		},
+	}
+
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			if !reflect.DeepEqual(test.want, test.got) {
+				t.Errorf("want %+v, got %+v", test.want, test.got)
+			}
+		})
+	}
 }

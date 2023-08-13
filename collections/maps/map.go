@@ -1,6 +1,8 @@
 package maps
 
-import "github.com/gotidy/lib/collections/set"
+import (
+	"github.com/gotidy/lib/collections/set"
+)
 
 // Has returns true if m1 contains key.
 func Has[K comparable, V any](m map[K]V, key K) bool {
@@ -61,6 +63,17 @@ func Union[K comparable, V any](m1, m2 map[K]V) map[K]V {
 	}
 	for k, v := range m1 {
 		result[k] = v
+	}
+	return result
+}
+
+// Merge maps, last values overwrite first.
+func Merge[K comparable, T any](items ...map[K]T) map[K]T {
+	result := make(map[K]T, len(items[0])*len(items))
+	for _, item := range items {
+		for k, t := range item {
+			result[k] = t
+		}
 	}
 	return result
 }
@@ -130,4 +143,12 @@ func Reduce[K comparable, V, R any](m map[K]V, initializer R, f func(R, K, V) R)
 		r = f(r, k, v)
 	}
 	return r
+}
+
+// Append one map to another map.
+func Append[K comparable, V any](dst, src map[K]V) map[K]V {
+	for k, v := range src {
+		dst[k] = v
+	}
+	return dst
 }
