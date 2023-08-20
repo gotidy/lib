@@ -3,6 +3,8 @@ package oneof
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/gotidy/lib/types"
 )
 
 type Value interface {
@@ -35,7 +37,13 @@ func (o *OneOf[V, R]) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &v); err != nil {
 		return fmt.Errorf("unmarshalling sub object: %w", err)
 	}
-	if len(v) != 1 {
+	switch l := len(v); {
+	case l == 0:
+		var zero V
+		o.Value = zero
+		return nil
+	case l == 1:
+	case l > 1:
 		return fmt.Errorf("expected a one field, but contains  fields %d", len(v))
 	}
 
@@ -62,9 +70,10 @@ func (o *OneOf[V, R]) UnmarshalJSON(b []byte) error {
 
 // MarshalJSON marshals OneOf value.
 func (o OneOf[V, R]) MarshalJSON() ([]byte, error) {
-	// if o.Value == ptr.Zero[T]() {
-	// 	return nil, nil
-	// }
+	if types.IsNil(o.Value) {
+		return []byte("{}"), nil
+	}
+
 	v := map[string]V{o.Value.GetName(): o.Value}
 	b, err := json.Marshal(v)
 	if err != nil {

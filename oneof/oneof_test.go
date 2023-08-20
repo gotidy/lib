@@ -117,3 +117,40 @@ func TestOneOf_UnmarshalJSON_DoerFactory(t *testing.T) {
 		t.Errorf("want.Do() '%#v' != got.Do() '%#v'", wantErr, gotErr)
 	}
 }
+
+func TestOneOf_MarshalJSON_Empty(t *testing.T) {
+	s := struct {
+		Doer AnyDoer `json:"doer,omitempty"`
+	}{}
+
+	b, err := json.Marshal(s)
+	if err != nil {
+		t.Error("marshalling OneOf", err)
+	}
+
+	want := `{"doer":{}}`
+	if got := string(b); got != want {
+		t.Errorf("want '%s' != got '%s'", want, got)
+	}
+
+	s.Doer.Set(&DoYou{Me: "you"})
+
+	err = json.Unmarshal(b, &s)
+	if err != nil {
+		t.Error("unmarshalling OneOf", err)
+	}
+
+	got := s.Doer.Get()
+	if !reflect.DeepEqual(got, nil) {
+		t.Errorf("want '%#v' != got '%#v'", want, got)
+	}
+
+	func() {
+		defer func() {
+			if err := recover(); err == nil {
+				t.Error("want panic on empty value")
+			}
+		}()
+		_ = got.Do()
+	}()
+}
