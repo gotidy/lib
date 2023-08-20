@@ -278,6 +278,23 @@ func Fold[T comparable](s []T) []T {
 	return result
 }
 
+// FoldFunc deduplicates items by keys.
+func FoldFunc[T, K comparable](s []T, key func(T) K) []T {
+	if len(s) == 0 {
+		return nil
+	}
+	m := make(map[K]struct{})
+	result := make([]T, 0, len(s))
+	for _, v := range s {
+		k := key(v)
+		if _, ok := m[k]; !ok {
+			m[k] = struct{}{}
+			result = append(result, v)
+		}
+	}
+	return result
+}
+
 // Group items.
 func Group[T any, K comparable](s []T, key func(T) K) map[K][]T {
 	m := make(map[K][]T)
@@ -546,4 +563,15 @@ func FindFirst[T any](items []T, filter func(item T) bool) (T, bool) {
 		}
 	}
 	return ptr.Zero[T](), false
+}
+
+// Count values.
+func Count[T any](s []T, f func(T) bool) int {
+	var count int
+	for _, item := range s {
+		if f(item) {
+			count++
+		}
+	}
+	return count
 }

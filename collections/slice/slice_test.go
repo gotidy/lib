@@ -374,6 +374,37 @@ func TestFold(t *testing.T) {
 	}
 }
 
+func TestFoldFunc(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name     string
+		s        []int
+		expected []int
+	}{
+		{
+			name:     "non empty",
+			s:        []int{0, 1, 2, 3, 1, 4, 0, 5},
+			expected: []int{0, 1, 2, 3, 4, 5},
+		},
+		{
+			name:     "nil",
+			s:        nil,
+			expected: nil,
+		},
+	}
+
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			actual := FoldFunc(test.s, func(i int) string { return strconv.Itoa(i) })
+			if !reflect.DeepEqual(actual, test.expected) {
+				t.Errorf("expected %+v, actual %+v", test.expected, actual)
+			}
+		})
+	}
+}
+
 func TestClone(t *testing.T) {
 	s := []int{0, 1, 2, 3, 1, 4, 0, 5}
 	res := Clone(s)
