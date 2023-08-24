@@ -2,15 +2,21 @@ package oneof
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/gotidy/lib/types"
 )
 
+// ErrEmpty returned by the unmarshaler when data is empty '{}'.
+var ErrEmpty = errors.New("empty")
+
+// Value is the interface that must be implemented by any OneOf value.
 type Value interface {
 	GetName() string
 }
 
+// Factory describe objects factory.
 type Factory[V Value] interface {
 	New(name string) (V, error)
 }
@@ -37,14 +43,8 @@ func (o *OneOf[V, R]) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &v); err != nil {
 		return fmt.Errorf("unmarshalling sub object: %w", err)
 	}
-	switch l := len(v); {
-	case l == 0:
-		var zero V
-		o.Value = zero
-		return nil
-	case l == 1:
-	case l > 1:
-		return fmt.Errorf("expected a one field, but contains  fields %d", len(v))
+	if l := len(v); l > 1 {
+		return fmt.Errorf("expected a one field, but contains fields %d", l)
 	}
 
 	var name string
@@ -52,11 +52,19 @@ func (o *OneOf[V, R]) UnmarshalJSON(b []byte) error {
 	for k, v := range v {
 		name = k
 		raw = v
+		break
 	}
 
 	value, err := o.factory.New(name)
-	if err != nil {
+	switch {
+	case err != nil && len(v) == 0:
+		return ErrEmpty // Drop factory error.
+	case err != nil:
 		return fmt.Errorf("getting object '%s': %w", name, err)
+	case len(v) == 0:
+		var zero V
+		o.Value = zero
+		return nil
 	}
 
 	err = json.Unmarshal(raw, value)

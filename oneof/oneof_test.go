@@ -8,8 +8,6 @@ import (
 	"testing"
 )
 
-var ErrOps = errors.New("ops")
-
 type Doer interface {
 	Value
 	Do() error
@@ -20,7 +18,7 @@ type DoMe struct {
 }
 
 func (d *DoMe) Do() error {
-	return ErrOps
+	return nil
 }
 
 func (*DoMe) GetName() string {
@@ -39,6 +37,16 @@ func (*DoYou) GetName() string {
 	return "you"
 }
 
+func DoerNew(name string) (Doer, error) {
+	switch {
+	case (*DoMe)(nil).GetName() == name:
+		return new(DoMe), nil
+	case (*DoYou)(nil).GetName() == name:
+		return new(DoYou), nil
+	}
+	return nil, fmt.Errorf("unknown type name %s", name)
+}
+
 type DoerFactory struct{}
 
 func (f DoerFactory) New(name string) (Doer, error) {
@@ -54,6 +62,8 @@ func (f DoerFactory) New(name string) (Doer, error) {
 type AnyDoer = OneOf[Doer, DoerFactory]
 
 func TestOneOf_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
 	s := struct {
 		Doer AnyDoer `json:"doer,omitempty"`
 	}{}
@@ -83,7 +93,9 @@ func TestOneOf_MarshalJSON(t *testing.T) {
 	}
 }
 
-func TestOneOf_UnmarshalJSON_DoerFactory(t *testing.T) {
+func TestOneOf_UnmarshalJSON(t *testing.T) {
+	t.Parallel()
+
 	s := struct {
 		Doer AnyDoer `json:"doer,omitempty"`
 	}{}
@@ -99,9 +111,6 @@ func TestOneOf_UnmarshalJSON_DoerFactory(t *testing.T) {
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("want '%#v' != got '%#v'", want, got)
 	}
-	if wantErr, gotErr := want.Do(), got.Do(); wantErr != gotErr {
-		t.Errorf("want.Do() '%#v' != got.Do() '%#v'", wantErr, gotErr)
-	}
 
 	err = json.Unmarshal([]byte(`{"doer":{"you":{"me":"you"}}}`), &s)
 	if err != nil {
@@ -113,12 +122,11 @@ func TestOneOf_UnmarshalJSON_DoerFactory(t *testing.T) {
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("want '%#v' != got '%#v'", want, got)
 	}
-	if wantErr, gotErr := want.Do(), got.Do(); wantErr != gotErr {
-		t.Errorf("want.Do() '%#v' != got.Do() '%#v'", wantErr, gotErr)
-	}
 }
 
 func TestOneOf_MarshalJSON_Empty(t *testing.T) {
+	t.Parallel()
+
 	s := struct {
 		Doer AnyDoer `json:"doer,omitempty"`
 	}{}
@@ -133,16 +141,12 @@ func TestOneOf_MarshalJSON_Empty(t *testing.T) {
 		t.Errorf("want '%s' != got '%s'", want, got)
 	}
 
-	s.Doer.Set(&DoYou{Me: "you"})
-
 	err = json.Unmarshal(b, &s)
-	if err != nil {
+	if err != nil && !errors.Is(err, ErrEmpty) {
 		t.Error("unmarshalling OneOf", err)
 	}
-
-	got := s.Doer.Get()
-	if !reflect.DeepEqual(got, nil) {
-		t.Errorf("want '%#v' != got '%#v'", want, got)
+	if err == nil {
+		t.Error("expected error")
 	}
 
 	func() {
@@ -151,6 +155,39 @@ func TestOneOf_MarshalJSON_Empty(t *testing.T) {
 				t.Error("want panic on empty value")
 			}
 		}()
-		_ = got.Do()
+		_ = s.Doer.Get().Do()
 	}()
+}
+
+type DoerFactoryWithEmpty struct{}
+
+func (f DoerFactoryWithEmpty) New(name string) (Doer, error) {
+	switch {
+	case (*DoMe)(nil).GetName() == name:
+		return new(DoMe), nil
+	case (*DoYou)(nil).GetName() == name:
+		return new(DoYou), nil
+	case "" == name:
+		// The value will be nil instead of returning an error when empty JSON is unmarshaled.
+		return nil, nil
+	}
+	return nil, fmt.Errorf("unknown type name %s", name)
+}
+
+func TestOneOf_MarshalJSON_EmptyNoErr(t *testing.T) {
+	t.Parallel()
+
+	type AnyDoer = OneOf[Doer, DoerFactoryWithEmpty]
+
+	s := struct {
+		Doer AnyDoer `json:"doer,omitempty"`
+	}{
+		Doer: AnyDoer{Value: &DoMe{You: "me"}},
+	}
+
+	b := []byte(`{"doer":{}}`)
+	err := json.Unmarshal(b, &s)
+	if err != nil {
+		t.Error("unmarshalling OneOf", err)
+	}
 }
