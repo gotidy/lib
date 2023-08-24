@@ -18,12 +18,12 @@ func Max[T constraints.Ordered](v1, v2 T) T {
 	return v1
 }
 
-// Between returns true if value is between max and min.
+// Between returns true if the value is between max and min.
 func Between[T constraints.Ordered](v, min, max T) bool {
 	return v >= min && v <= max
 }
 
-// MustBetween returns true if value is between max and min.
+// MustBetween returns the value between max and min.
 func MustBetween[T constraints.Ordered](v, min, max T) T {
 	if v < min {
 		return min
