@@ -52,6 +52,16 @@ func EqualValue[T comparable](p *T, v T) bool {
 	return p != nil && *p == v
 }
 
+// NotEqual compare values of two pointers.
+func NotEqual[T comparable](v1, v2 *T) bool {
+	return v1 != nil && v2 != nil && *v1 != *v2
+}
+
+// NotEqualValue compare the value of pointer with the value.
+func NotEqualValue[T comparable](p *T, v T) bool {
+	return p != nil && *p != v
+}
+
 // ConvertNumber  the pointer of number of one type to another type.
 func ConvertNumber[T, V constraints.Number](t *T) *V {
 	if t == nil {
