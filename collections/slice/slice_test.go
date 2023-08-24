@@ -3,6 +3,7 @@ package slice
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"reflect"
 	"sort"
 	"strconv"
@@ -397,7 +398,7 @@ func TestFoldFunc(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			actual := FoldFunc(test.s, func(i int) string { return strconv.Itoa(i) })
+			actual := FoldFunc(test.s, strconv.Itoa)
 			if !reflect.DeepEqual(actual, test.expected) {
 				t.Errorf("expected %+v, actual %+v", test.expected, actual)
 			}
@@ -674,4 +675,207 @@ func TestAppendNotNil(t *testing.T) {
 			}
 		})
 	}
+}
+
+func ExampleCount() {
+	fmt.Println(Count([]string{"fish", "crab", "", "octopus", "", "squid", "", ""}, func(v string) bool { return v == "" }))
+
+	// Output:
+	// 4
+}
+
+func ExampleMergeSorted() {
+	fmt.Println(MergeSorted([]int{1, 3, 4, 7}, []int{2, 3, 6, 8}, func(v1, v2 int) bool { return v1 < v2 }, 0))
+	fmt.Println(MergeSorted([]int{1, 3, 4, 7}, []int{2, 3, 6, 8}, func(v1, v2 int) bool { return v1 < v2 }, 3))
+
+	// Output:
+	// [1 2 3 3 4 6 7 8]
+	// [1 2 3]
+}
+
+func ExampleMergeSortedTo() {
+	s1, s2 := []int{1, 3, 4, 7}, []int{2, 3, 6, 8}
+	fmt.Println(MergeSortedTo(s1, s1, s2, func(v1, v2 int) bool { return v1 < v2 }, 0))
+	s1, s2 = []int{1, 3, 4, 7}, []int{2, 3, 6, 8}
+	fmt.Println(MergeSortedTo(s1, s1, s2, func(v1, v2 int) bool { return v1 < v2 }, 3))
+	s1, s2 = []int{1, 3, 4, 7}, []int{2, 3, 6, 8}
+	fmt.Println(MergeSortedTo(s1, s1, s2, func(v1, v2 int) bool { return v1 < v2 }, 20))
+	s1, s2 = nil, []int{2, 3, 6, 8}
+	fmt.Println(MergeSortedTo(s1, s1, s2, func(v1, v2 int) bool { return v1 < v2 }, 0))
+	s1, s2 = []int{2, 3, 6, 8}, nil
+	fmt.Println(MergeSortedTo(s1, s1, s2, func(v1, v2 int) bool { return v1 < v2 }, 0))
+
+	// Output:
+	// [1 2 3 3 4 6 7 8]
+	// [1 2 3]
+	// [1 2 3 3 4 6 7 8]
+	// [2 3 6 8]
+	// [2 3 6 8]
+}
+
+func BenchmarkMergeSorted(b *testing.B) {
+	const count = 10
+	sizes := []int{10, 100, 1000, 10000}
+
+	bench := func(b *testing.B, size, limit int, limitName string) {
+		var resultMerge, resultQuicksort []int
+		b.Run("merge_____"+limitName+"_"+strconv.Itoa(size), func(b *testing.B) {
+			rand.Seed(1) //nolint
+			var ss [][]int
+			for i := 0; i < count; i++ {
+				s := make([]int, size)
+				for j := 0; j < size; j++ {
+					s[j] = j*3 + rand.Intn(3) //nolint
+				}
+				ss = append(ss, s)
+			}
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				resultMerge = ss[0]
+				for i := 1; i < len(ss); i++ {
+					resultMerge = MergeSortedTo(resultMerge, resultMerge, ss[i], func(v1, v2 int) bool { return v1 < v2 }, limit)
+				}
+			}
+		})
+
+		b.Run("quicksort_"+limitName+"_"+strconv.Itoa(size), func(b *testing.B) {
+			rand.Seed(1) //nolint
+			var ss [][]int
+			for i := 0; i < count; i++ {
+				s := make([]int, size)
+				for j := 0; j < size; j++ {
+					s[j] = j*3 + rand.Intn(3) //nolint
+				}
+				ss = append(ss, s)
+			}
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				resultQuicksort = nil
+				for i := 0; i < len(ss); i++ {
+					resultQuicksort = append(resultQuicksort, ss[i]...)
+				}
+				sort.Slice(resultQuicksort, func(i, j int) bool { return resultQuicksort[i] < resultQuicksort[j] })
+			}
+		})
+		if limit > 0 {
+			resultQuicksort = resultQuicksort[:limit]
+		}
+
+		if !reflect.DeepEqual(resultMerge, resultQuicksort) {
+			b.Fatalf("results (size %d, limit %d) is different len(resultMerge)=%d, len(resultQuicksort)=%d", size, limit, len(resultMerge), len(resultQuicksort))
+		}
+	}
+
+	for _, size := range sizes {
+		bench(b, size, size, "limited=size")
+		bench(b, size, 0, "limited=_no_")
+	}
+}
+
+func TestRemoveManyPanic(t *testing.T) {
+	t.Parallel()
+	defer func() { _ = recover() }()
+	_ = RemoveMany([]string{"0", "1", "2", "3", "4", "5"}, 4, 3)
+	t.Errorf("expected panic")
+}
+
+func ExampleRemoveFunc() {
+	fmt.Println(RemoveFunc([]int{2, 3, 4, 7, 0, 5, 100, 15, 30, 31}, func(i int) bool { return i%2 == 0 }))
+	fmt.Println(RemoveFunc([]int{1, 3, 4, 7, 0, 5, 100, 15, 30, 32}, func(i int) bool { return i%2 == 0 }))
+	fmt.Println(RemoveFunc([]int{1, 1}, func(i int) bool { return i%2 == 1 }))
+	fmt.Println(RemoveFunc([]int{1, 1}, func(i int) bool { return i%2 == 0 }))
+	fmt.Println(RemoveFunc([]int{1}, func(i int) bool { return i%2 == 0 }))
+	fmt.Println(RemoveFunc([]int{1}, func(i int) bool { return i%2 == 1 }))
+	fmt.Println(RemoveFunc([]int{}, func(i int) bool { return i%2 == 0 }))
+	fmt.Println(RemoveFunc([]int(nil), func(i int) bool { return i%2 == 0 }))
+
+	// Output:
+	// [3 7 5 15 31]
+	// [1 3 7 5 15]
+	// []
+	// [1 1]
+	// [1]
+	// []
+	// []
+	// []
+}
+
+func TestRemove(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name     string
+		s        []string
+		pos      int
+		expected []string
+	}{
+		{
+			name:     "Remove from start",
+			s:        []string{"0", "1", "2", "3", "4", "5"},
+			pos:      0,
+			expected: []string{"1", "2", "3", "4", "5"},
+		},
+		{
+			name:     "Remove from middle",
+			s:        []string{"0", "1", "2", "3", "4", "5"},
+			pos:      3,
+			expected: []string{"0", "1", "2", "4", "5"},
+		},
+		{
+			name:     "Remove from end",
+			s:        []string{"0", "1", "2", "3", "4", "5"},
+			pos:      5,
+			expected: []string{"0", "1", "2", "3", "4"},
+		},
+	}
+
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			if res := Remove(test.s, test.pos); !reflect.DeepEqual(res, test.expected) {
+				t.Errorf("expected %+v, actual %+v", test.expected, res)
+			}
+		})
+	}
+}
+
+func TestRemovePanic(t *testing.T) {
+	t.Parallel()
+	defer func() { _ = recover() }()
+	_ = Remove([]string{"0", "1", "2", "3", "4", "5"}, 25)
+	t.Errorf("expected panic")
+}
+
+func ExampleHasDuplicates() {
+	fmt.Println(HasDuplicates([]int{1, 3, 4, 7, 0, 5, 100, 15, 30, 31}))
+	fmt.Println(HasDuplicates([]int{1, 3, 4, 7, 0, 5, 100, 3, 30, 31}))
+	fmt.Println(HasDuplicates([]int{1, 1}))
+	fmt.Println(HasDuplicates([]int{1}))
+	fmt.Println(HasDuplicates([]int{}))
+	fmt.Println(HasDuplicates([]int(nil)))
+
+	// Output:
+	// false
+	// true
+	// true
+	// false
+	// false
+	// false
+}
+
+func ExampleHasDuplicatesFunc() {
+	fmt.Println(HasDuplicatesFunc([]int{1, 3, 4, 7, 0, 5, 100, 15, 30, 31}, func(i int) int { return i }))
+	fmt.Println(HasDuplicatesFunc([]int{1, 3, 4, 7, 0, 5, 100, 3, 30, 31}, func(i int) int { return i }))
+	fmt.Println(HasDuplicatesFunc([]int{1, 1}, func(i int) int { return i }))
+	fmt.Println(HasDuplicatesFunc([]int{1}, func(i int) int { return i }))
+	fmt.Println(HasDuplicatesFunc([]int{}, func(i int) int { return i }))
+	fmt.Println(HasDuplicatesFunc([]int(nil), func(i int) int { return i }))
+
+	// Output:
+	// false
+	// true
+	// true
+	// false
+	// false
+	// false
 }

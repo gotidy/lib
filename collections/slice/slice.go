@@ -22,28 +22,28 @@ func Index[T comparable](s []T, v T) int {
 }
 
 // Insert the value at the specified position of the slice.
-func Insert[T any](s []T, pos int, v T) []T {
+func Insert[T any](s []T, pos int, v ...T) []T {
 	if pos > len(s) || pos < 0 {
 		panic(fmt.Sprintf("pos %d is out of range 0..%d", pos, len(s)))
 	}
-	len := len(s)
-	if cap(s) > len {
-		s = s[:len+1]
-		if pos < len {
-			copy(s[pos+1:], s[pos:len])
+	length := len(s)
+	if cap(s) >= length+len(v) {
+		s = s[:length+len(v)]
+		if pos < length {
+			copy(s[pos+len(v):], s[pos:length])
 		}
-		s[pos] = v
+		copy(s[pos:], v)
 		return s
 	}
 
-	result := make([]T, len+1)
+	result := make([]T, length+len(v))
 	if pos > 0 {
 		copy(result[:pos], s[:pos])
 	}
-	if pos < len {
-		copy(result[pos+1:], s[pos:])
+	if pos < length {
+		copy(result[pos+len(v):], s[pos:])
 	}
-	result[pos] = v
+	copy(result[pos:], v)
 	return result
 }
 
@@ -574,4 +574,141 @@ func Count[T any](s []T, f func(T) bool) int {
 		}
 	}
 	return count
+}
+
+// Remove the element at position. It returns the same slice with reduced size.
+func Remove[T any](s []T, pos int) []T {
+	return RemoveMany(s, pos, 1)
+}
+
+// Remove the elements at position. It returns the same slice with reduced size.
+func RemoveMany[T any](s []T, pos int, amount int) []T {
+	if pos > len(s) || pos < 0 {
+		panic(fmt.Sprintf("pos %d is out of range 0..%d", pos, len(s)))
+	}
+	if amount < 0 || amount+pos > len(s) {
+		panic(fmt.Sprintf("amount %d is out of range 0..%d", amount, len(s)-pos))
+	}
+	copy(s[pos:], s[pos+amount:])
+	return s[:len(s)-amount]
+}
+
+// Remove elements from the slice. It returns the same slice with reduced size.
+func RemoveFunc[T any](s []T, remove func(item T) bool) []T {
+	if s == nil {
+		return nil
+	}
+
+	var current int
+	for i := 0; i < len(s); i++ {
+		if remove(s[i]) {
+			continue
+		}
+		if current != i {
+			s[current] = s[i]
+		}
+		current++
+	}
+	return s[:current]
+}
+
+// HasDuplicates checks if the slice has deduplicates.
+func HasDuplicates[T comparable](s []T) bool {
+	if len(s) < 2 {
+		return false
+	}
+	m := make(map[T]struct{})
+	for _, v := range s {
+		if _, ok := m[v]; ok {
+			return true
+		}
+		m[v] = struct{}{}
+	}
+	return false
+}
+
+// HasDuplicatesFunc checks if the slice has deduplicates.
+func HasDuplicatesFunc[T, K comparable](s []T, key func(T) K) bool {
+	if len(s) < 2 {
+		return false
+	}
+	m := make(map[K]struct{})
+	for _, v := range s {
+		k := key(v)
+		if _, ok := m[k]; ok {
+			return true
+		}
+		m[k] = struct{}{}
+	}
+	return false
+}
+
+// Grow slice capacity.
+func Grow[T any](s []T, capacity int) []T {
+	if capacity < 0 {
+		panic("capacity cannot be negative")
+	}
+
+	if capacity < len(s) || capacity <= cap(s) {
+		return s
+	}
+
+	return append(make([]T, 0, capacity), s...)
+}
+
+// MergeSortedTo merges two sorted slices to one sorted. Dst may be overwritten if capacity is enough.
+// s1 or s2 may be used as dst (for collecting values from many slices to one).
+// If limit is zero then result size is not limited.
+func MergeSortedTo[T any](dst, src1, src2 []T, less func(v1, v2 T) bool, limit int) []T {
+	size1 := len(src1)
+	size2 := len(src2)
+	i1 := len(src1) - 1
+	i2 := len(src2) - 1
+	switch {
+	case limit == 0:
+		limit = size1 + size2
+	case limit < 0:
+		panic("capacity cannot be negative")
+	default:
+		limit = math.Min(limit, size1+size2)
+	}
+	dst = Grow(dst, size1+size2)[:size1+size2]
+	for k := size1 + size2 - 1; k >= 0; k-- {
+		if i1 >= 0 && i2 >= 0 && !less(src1[i1], src2[i2]) {
+			dst[k] = src1[i1]
+			i1--
+		} else if i2 >= 0 {
+			dst[k] = src2[i2]
+			i2--
+		}
+	}
+
+	return dst[:limit]
+}
+
+// MergeSorted merges two sorted slices to one new sorted.
+// If limit is zero then result size is not limited.
+func MergeSorted[T any](s1 []T, s2 []T, less func(v1, v2 T) bool, limit int) []T {
+	size1 := len(s1)
+	size2 := len(s2)
+	switch {
+	case limit == 0:
+		limit = size1 + size2
+	case limit < 0:
+		panic("capacity cannot be negative")
+	default:
+		limit = math.Min(limit, size1+size2)
+	}
+	dst := make([]T, limit)
+	for k, i1, i2 := 0, 0, 0; k < limit; k++ {
+		if i1 < size1 && i2 < size2 && less(s1[i1], s2[i2]) {
+			dst[k] = s1[i1]
+			i1++
+		} else if i2 < size2 {
+			dst[k] = s2[i2]
+			i2++
+		}
+	}
+
+	return dst
 }
