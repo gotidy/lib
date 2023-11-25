@@ -712,3 +712,19 @@ func MergeSorted[T any](s1 []T, s2 []T, less func(v1, v2 T) bool, limit int) []T
 
 	return dst
 }
+
+// Sort slices ascending.
+func Sort[T constraints.Ordered](s []T) {
+	sort.Slice(s, func(i, j int) bool { return s[i] < s[j] })
+}
+
+// Sort slices descending.
+func SortDesc[T constraints.Ordered](s []T) {
+	sort.Slice(s, func(i, j int) bool { return s[i] > s[j] })
+}
+
+// FitIndex fits the index into slice range.
+// If the slice is empty the result will be -1.
+func FitIndex[T any](index int, s []T) int {
+	return math.MustBetween(index, 0, len(s)-1)
+}

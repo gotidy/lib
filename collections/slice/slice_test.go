@@ -879,3 +879,16 @@ func ExampleHasDuplicatesFunc() {
 	// false
 	// false
 }
+
+func ExampleFitIndex() {
+	fmt.Println(FitIndex(-1, []int{1, 1, 1}))
+	fmt.Println(FitIndex(11, []int{1, 1, 1}))
+	fmt.Println(FitIndex(1, []int{1, 1, 1}))
+	fmt.Println(FitIndex(1, []int{}))
+
+	// Output:
+	// 0
+	// 2
+	// 1
+	// -1
+}
