@@ -4,6 +4,6 @@
 
 [godev]: https://pkg.go.dev/github.com/gotidy/lib/collections
 
-- [Map](maps/README.md)
-- [Slice](slice/README.md)
-- [Set](set/README.md)
+- [Map](maps/README.md) Contains map helpers.
+- [Slice](slice/README.md) Contains slice helpers.
+- [Set](set/README.md) Realize `Set` type.
