@@ -23,7 +23,7 @@ go get -u github.com/gotidy/lib
 
 - [Map](collections/maps/README.md) Contains map helpers.
 - [Slice](collections/slice/README.md) Contains slice helpers.
-- [Set](collections/set/README.md) The implementation of the set type.
+- [Set](collections/set/README.md) Realize `Set` type.
 
 ### [Math](math/README.md)
 
