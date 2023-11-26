@@ -728,3 +728,16 @@ func SortDesc[T constraints.Ordered](s []T) {
 func FitIndex[T any](index int, s []T) int {
 	return math.MustBetween(index, 0, len(s)-1)
 }
+
+// Last returns last element. It panics if slice has zero length.
+func Last[T constraints.Ordered](s []T) T {
+	return s[len(s)-1]
+}
+
+// LastExists returns last element.
+func LastExists[T constraints.Ordered](s []T) (element T, exists bool) {
+	if len(s) == 0 {
+		return ptr.Zero[T](), false
+	}
+	return s[len(s)-1], true
+}

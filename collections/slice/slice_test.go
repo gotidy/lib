@@ -892,3 +892,55 @@ func ExampleFitIndex() {
 	// 1
 	// -1
 }
+
+func ExampleLast() {
+	fmt.Println(Last([]int{10, 20, 30}))
+
+	// Output:
+	// 30
+}
+
+func TestLast_Panic(t *testing.T) {
+	t.Parallel()
+	for i, s := range [][]int{nil, {}} {
+		s := s
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Parallel()
+			defer func() {
+				if r := recover(); r == nil {
+					t.Error("must panic")
+				}
+			}()
+			Last(s)
+		})
+	}
+}
+
+func ExampleLastExists() {
+	fmt.Println(LastExists([]int{10, 20, 30}))
+	fmt.Println(LastExists([]int{}))
+	fmt.Println(LastExists[int](nil))
+
+	// Output:
+	// 30 true
+	// 0 false
+	// 0 false
+}
+
+func ExampleSort() {
+	s := []int{10, 120, 30}
+	Sort(s)
+	fmt.Println(s)
+
+	// Output:
+	// [10 30 120]
+}
+
+func ExampleSortDesc() {
+	s := []int{10, 120, 30}
+	SortDesc(s)
+	fmt.Println(s)
+
+	// Output:
+	// [10 30 120]
+}
