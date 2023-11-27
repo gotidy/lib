@@ -1,3 +1,4 @@
+// Package contains functions that simplify inline conditions.
 package conditions
 
 // If returns the value depend to the condition.

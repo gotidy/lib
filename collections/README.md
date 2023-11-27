@@ -7,6 +7,7 @@
 - [Map](maps/README.md) Contains map helpers.
 - [Slice](slice/README.md) Contains slice helpers.
 - [Set](set/README.md) Realize `Set` type.
+- [Group](group/README.md) Realize `Group` type.
 
 ## Documentation
 

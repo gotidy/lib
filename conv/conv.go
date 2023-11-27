@@ -1,3 +1,4 @@
+// Contains conversion helpers.
 package conv
 
 import (

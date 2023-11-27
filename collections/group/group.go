@@ -1,3 +1,4 @@
+// Realize `Group` type.
 package group
 
 // Group.

@@ -1,4 +1,4 @@
-// Package semaphore provides a weighted semaphore implementation.
+// Package semaphore provides a semaphore implementation.
 package sync
 
 import "context"

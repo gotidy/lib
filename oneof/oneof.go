@@ -1,3 +1,5 @@
+// Realize `OneOf` type. It allows to store different types in one variable.
+// OneOf supports also JSON marshalling and unmarshalling.
 package oneof
 
 import (

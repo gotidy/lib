@@ -4,7 +4,7 @@
 
 [godev]: https://pkg.go.dev/github.com/gotidy/lib/conv
 
-Contains constraints types.
+Contains conversion helpers.
 
 ## Documentation
 

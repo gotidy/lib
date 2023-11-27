@@ -1,3 +1,4 @@
+// Package ptr contains functions for simplified creation of pointers from constants of basic types.
 package ptr
 
 import (

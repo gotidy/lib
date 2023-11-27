@@ -1,3 +1,4 @@
+// Contains slice helpers (Map, Filter, Reduce, Fold, Remove, ToMap and ect.).
 package slice
 
 import (

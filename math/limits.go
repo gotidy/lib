@@ -1,3 +1,4 @@
+// Contains mathematic functions.
 package math
 
 import "github.com/gotidy/lib/constraints"

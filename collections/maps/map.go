@@ -1,3 +1,4 @@
+// Contains map helpers (Map, Filter, Reduce, Clone, Has, Diff and ect.).
 package maps
 
 import (
