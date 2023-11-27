@@ -7,3 +7,7 @@
 - [Map](maps/README.md) Contains map helpers.
 - [Slice](slice/README.md) Contains slice helpers.
 - [Set](set/README.md) Realize `Set` type.
+
+## Documentation
+
+[GoDoc](http://godoc.org/github.com/gotidy/slice)

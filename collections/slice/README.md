@@ -5,3 +5,7 @@
 [godev]: https://pkg.go.dev/github.com/gotidy/lib/collections/slice
 
 Contains slice helpers.
+
+## Documentation
+
+[GoDoc](http://godoc.org/github.com/gotidy/collections/slice)

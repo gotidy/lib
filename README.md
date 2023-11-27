@@ -25,25 +25,29 @@ go get -u github.com/gotidy/lib
 - [Slice](collections/slice/README.md) Contains slice helpers.
 - [Set](collections/set/README.md) Realize `Set` type.
 
-### [Math](math/README.md)
-
-### [Constraints](constraints/README.md)
-
 ### [Ptr](ptr/README.md)
 
 Contains functions for simplified creation of pointers from constants of basic types.
-
-### [Conditions](conditions/README.md)
-
-Contains functions that simplify inline conditions.
 
 ### [Conversions](conversions/README.md)
 
 Contains conversion helpers.
 
+### [Conditions](conditions/README.md)
+
+Contains functions that simplify inline conditions.
+
 ### [OneOf](oneof/README.md)
 
 Realize `OneOf` type.
+
+### [Math](math/README.md)
+
+Contains mathematic functions.
+
+### [Constraints](constraints/README.md)
+
+Contains constraints types.
 
 ## License
 
