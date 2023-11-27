@@ -8,4 +8,4 @@ Realize `Set` type.
 
 ## Documentation
 
-[GoDoc](http://godoc.org/github.com/gotidy/collections/set)
+[GoDoc](http://godoc.org/github.com/gotidy/lib/collections/set)

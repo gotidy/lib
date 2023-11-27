@@ -8,4 +8,4 @@ Realize `Group` type.
 
 ## Documentation
 
-[GoDoc](http://godoc.org/github.com/gotidy/collections/group)
+[GoDoc](http://godoc.org/github.com/gotidy/lib/collections/group)

@@ -8,4 +8,4 @@ Contains slice helpers.
 
 ## Documentation
 
-[GoDoc](http://godoc.org/github.com/gotidy/collections/slice)
+[GoDoc](http://godoc.org/github.com/gotidy/lib/collections/slice)

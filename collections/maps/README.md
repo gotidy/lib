@@ -8,4 +8,4 @@ Contains map helpers.
 
 ## Documentation
 
-[GoDoc](http://godoc.org/github.com/gotidy/collections/maps)
+[GoDoc](http://godoc.org/github.com/gotidy/lib/collections/maps)
