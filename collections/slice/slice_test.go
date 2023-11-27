@@ -942,5 +942,5 @@ func ExampleSortDesc() {
 	fmt.Println(s)
 
 	// Output:
-	// [10 30 120]
+	// [120 30 10]
 }
