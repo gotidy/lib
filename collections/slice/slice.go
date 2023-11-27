@@ -280,7 +280,7 @@ func Fold[T comparable](s []T) []T {
 }
 
 // FoldFunc deduplicates items by keys.
-func FoldFunc[T, K comparable](s []T, key func(T) K) []T {
+func FoldFunc[T any, K comparable](s []T, key func(T) K) []T {
 	if len(s) == 0 {
 		return nil
 	}
