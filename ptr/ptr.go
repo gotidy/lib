@@ -107,7 +107,7 @@ func StrDef[T any](v *T, def string) string {
 	return fmt.Sprintf("%v", *v)
 }
 
-// Coalesce returns first not nil. If all elements are nil, nil will be returned.
+// Coalesce returns the first not nil value. If all elements are nil, the nil will be returned.
 func Coalesce[T any](pp ...*T) *T {
 	for _, p := range pp {
 		if p != nil {
