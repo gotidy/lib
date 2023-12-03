@@ -44,3 +44,18 @@ func ExampleEqual() {
 	// true
 	// false
 }
+
+func ExampleCoalesce() {
+	fmt.Println(Value(Coalesce[int](nil, Of(1), Of(2))))
+	fmt.Println(Value(Coalesce[int](Of(2), Of(1), nil)))
+	fmt.Println(Value(Coalesce[int](Of(2))))
+	fmt.Println(Coalesce[int](nil, nil))
+	fmt.Println(Coalesce[int]())
+
+	// Output:
+	// 1
+	// 2
+	// 2
+	// <nil>
+	// <nil>
+}
