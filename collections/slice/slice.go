@@ -94,6 +94,27 @@ func MapFilter[T1, T2 any](s []T1, f func(T1) (T2, bool)) []T2 {
 	return result
 }
 
+// MapFold turns a []T to a []K using a mapping function.
+// The result will be contain unique values.
+func MapFold[T any, K comparable](ss []T, f func(T) K) []K {
+	if len(ss) == 0 {
+		return nil
+	}
+
+	exists := make(map[K]struct{}, len(ss))
+	result := make([]K, 0, len(ss))
+	for _, s := range ss {
+		v := f(s)
+		if _, ok := exists[v]; ok {
+			continue
+		}
+		exists[v] = struct{}{}
+		result = append(result, v)
+	}
+
+	return result
+}
+
 // MapNotNil turns a []*T1 to a []T2 using a mapping function, exclude nil values.
 // This works with slices of any type.
 // The resulting slice may have a smaller size than the original.

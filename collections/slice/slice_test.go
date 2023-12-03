@@ -177,6 +177,17 @@ func TestMapIndexed(t *testing.T) {
 	}
 }
 
+func ExampleMapFold() {
+	fmt.Println(MapFold([]int{0, 1, 2, 3, 4, 5}, strconv.Itoa))
+	fmt.Println(MapFold([]int{0, 1, 2, 1, 3, 4, 5, 0}, strconv.Itoa))
+	fmt.Println(MapFold(nil, strconv.Itoa))
+
+	// Output:
+	// [0 1 2 3 4 5]
+	// [0 1 2 3 4 5]
+	// []
+}
+
 func TestFilter(t *testing.T) {
 	s := []int{0, 1, 2, 3, 4, 5}
 	expected := []int{2, 3}
