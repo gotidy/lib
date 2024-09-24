@@ -4,6 +4,7 @@ package set
 import (
 	"encoding/json"
 	"fmt"
+	"iter"
 	"strings"
 )
 
@@ -20,6 +21,15 @@ type Set[M comparable] map[M]struct{}
 func Of[M comparable](members ...M) Set[M] {
 	result := make(Set[M])
 	for _, member := range members {
+		result[member] = struct{}{}
+	}
+	return result
+}
+
+// OfSeq creates a new Set from sequence.
+func OfSeq[M comparable](seq iter.Seq[M]) Set[M] {
+	result := make(Set[M])
+	for member := range seq {
 		result[member] = struct{}{}
 	}
 	return result
