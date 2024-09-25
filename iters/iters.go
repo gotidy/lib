@@ -221,7 +221,7 @@ func Contains[T comparable](s T, in iter.Seq[T]) bool {
 	return false
 }
 
-// Equal compare two sequences.
+// Equal compare two sequences. Slow.
 func Equal[T comparable](s1, s2 iter.Seq[T]) bool {
 	next1, stop1 := iter.Pull(s1)
 	next2, stop2 := iter.Pull(s2)
