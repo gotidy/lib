@@ -434,3 +434,18 @@ func Group[K comparable, V any](seq iter.Seq2[K, V]) map[K][]V {
 func GroupFunc[K comparable, V any](seq iter.Seq[V], key func(V) K) map[K][]V {
 	return Group(WithKeys(seq, key))
 }
+
+// One return a sequence with one element.
+
+func One[V any](v V) iter.Seq[V] {
+	return func(yield func(V) bool) {
+		_ = yield(v)
+	}
+}
+
+// One return a sequence with one element.
+func One2[K, V any](k K, v V) iter.Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		_ = yield(k, v)
+	}
+}

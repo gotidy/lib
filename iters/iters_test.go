@@ -509,3 +509,17 @@ func ExampleGroupFunc() {
 	// Even: [2 4]
 	// Odd: [1 3 5]
 }
+
+func ExampleOne() {
+	printSeq(One(123456789))
+
+	// Output:
+	// 123456789
+}
+
+func ExampleOne2() {
+	printSeq2(One2(123456789, 987654321))
+
+	// Output:
+	// 123456789 987654321
+}
