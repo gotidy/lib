@@ -420,3 +420,17 @@ func Count2[K, V any](s iter.Seq2[K, V], f func(K, V) bool) int {
 	}
 	return count
 }
+
+// Group group sequence by key.
+func Group[K comparable, V any](seq iter.Seq2[K, V]) map[K][]V {
+	m := make(map[K][]V)
+	for k, v := range seq {
+		m[k] = append(m[k], v)
+	}
+	return m
+}
+
+// GroupFunc group sequence by key.
+func GroupFunc[K comparable, V any](seq iter.Seq[V], key func(V) K) map[K][]V {
+	return Group(WithKeys(seq, key))
+}

@@ -464,3 +464,48 @@ func BenchmarkFilter(b *testing.B) {
 		}
 	})
 }
+
+func ExampleGroup() {
+	var testSeq iter.Seq2[string, int] = func(yield func(string, int) bool) {
+		yield("a", 1)
+		yield("b", 2)
+		yield("a", 3)
+		yield("c", 4)
+		yield("b", 5)
+	}
+
+	result := Group(testSeq)
+
+	fmt.Println(result["a"])
+	fmt.Println(result["b"])
+	fmt.Println(result["c"])
+
+	// Output:
+	// [1 3]
+	// [2 5]
+	// [4]
+}
+
+func ExampleGroupFunc() {
+	var testSeq iter.Seq[int] = func(yield func(int) bool) {
+		yield(1)
+		yield(2)
+		yield(3)
+		yield(4)
+		yield(5)
+	}
+
+	result := GroupFunc(testSeq, func(v int) string {
+		if v%2 == 0 {
+			return "even"
+		}
+		return "odd"
+	})
+
+	fmt.Println("Even:", result["even"])
+	fmt.Println("Odd:", result["odd"])
+
+	// Output:
+	// Even: [2 4]
+	// Odd: [1 3 5]
+}
